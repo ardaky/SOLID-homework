@@ -39,7 +39,7 @@ classDiagram
 *(Tüm diyagramın ayrıntılı hali için `PATTERNS.md` dosyasına bakabilirsiniz.)*
 
 ## Nasıl Çalıştırılır?
-Projeyi terminalden veya komut satırından derleyip tüm tasarım örüntülerinin ahenk içindeki çalışmasını test etmek için `Main.java` sınıfını çalıştırabilirsiniz:
+Projeyi terminalden veya komut satırından derleyip tüm tasarım örüntülerinin ahenk içindeki çalışmasını test edebilirsiniz...
 
 ```bash
 # Projenin ana dizinindeyken:
