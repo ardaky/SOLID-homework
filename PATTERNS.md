@@ -1,89 +1,99 @@
 # Tasarım Örüntüleri Dokümantasyonu
 
 ## Faz 1 - Factory Method (Creational)
+**Nerede Uygulandı?** `SifrelemeFabrikasi`
+**Ne Kazandık?** Nesne üretim mantığı ile iş mantığı birbirinden ayrıldı.
 
-**Nerede Uygulandı?**
-`SifrelemeFabrikasi` sınıfında uygulandı.
-
-**Neden Uygulandı?**
-Eski yapıda nesne yaratma mantığı ile iş mantığı aynı sınıf (`SifrelemeAraci`) içerisindeydi. Yeni algoritma eklemek zordu.
-
-**Ne Kazandık?**
-Nesne üretme sorumluluğunu fabrikaya devrederek sınıfların birbirine sıkı sıkıya bağlı (tight coupling) olmasını engelledik.
-
-### UML Sınıf Diyagramı (Faz 1)
-
-```mermaid
-classDiagram
-    class ISifreleyici {
-        <<interface>>
-        +sifrele(metin: String): String
-        +coz(sifreliMetin: String): String
-    }
-    
-    ISifreleyici <|.. AesSifreleyici
-    ISifreleyici <|.. RsaSifreleyici
-    
-    class SifrelemeFabrikasi {
-        +sifreleyiciUret(tip: String): ISifreleyici
-    }
-```
+## Faz 2 - Decorator & Adapter (Structural)
+**Nerede Uygulandı?** `ZamanDamgaliSifreleyici` (Decorator) ve `EskiSistemAdapter` (Adapter).
+**Ne Kazandık?** Eski kodlara dokunmadan yeni özellikler ekleme ve uyumsuz dış kütüphaneleri sisteme entegre etme.
 
 ---
 
-## Faz 2 - Decorator & Adapter (Structural)
+## Faz 3 - Strategy & Observer (Behavioral)
 
-### 1. Decorator Pattern
-**Nerede Uygulandı?**
-`SifreleyiciDecorator` abstract sınıfı ve `ZamanDamgaliSifreleyici` sınıfında uygulandı.
-
-**Neden Uygulandı?**
-Şifreleme sonuçlarına ek özellikler (örneğin işlem zamanı damgası) eklemek istedik. Bunu var olan `AesSifreleyici` gibi sınıfların içine yazsaydık kod tekrarlarına ve sınıfların şişmesine yol açacaktık (OCP ihlali).
-
-**Ne Kazandık?**
-Çekirdek şifreleme sınıflarına dokunmadan, çalışma zamanında nesnelere yeni davranışlar ekleme esnekliği kazandık.
-
-### 2. Adapter Pattern
-**Nerede Uygulandı?**
-`EskiSistemAdapter` sınıfında uygulandı.
+### 1. Strategy Pattern
+**Nerede Uygulandı?** `SifrelemeAraci` içindeki `setStrateji(ISifreleyici)` metodu.
 
 **Neden Uygulandı?**
-Üçüncü parti / eski bir kütüphane olan `EskiSistem` sınıfının metod isimleri, bizim projemizin `ISifreleyici` arayüzüne uymuyordu.
+Kullanıcının program çalışırken algoritmayı (AES'ten RSA'ya) değiştirebilmesi gerekiyordu. 
+
+**Ne Kazandık (OCP Katkısı)?**
+Açık/Kapalı prensibini (OCP) çok net şekilde sağladık. Uygulamanın davranışı (`strateji`) runtime'da dışarıdan değiştirilebiliyor, var olan kod değiştirilmeden yeni yetenekler eklenebiliyor.
+
+### 2. Observer Pattern
+**Nerede Uygulandı?** `IGozlemci`, `KonsolLogger` ve `SifrelemeAraci`'nın `gozlemcilereHaberVer` mekanizmasında.
+
+**Neden Uygulandı?**
+Şifreleme aracı bir işlem yaptığında başka sistemlerin (örn. Logger mekanizması) bundan haberdar olması gerekiyordu, ancak şifreleme aracının Logger'ı doğrudan tanıması (sıkı bağ) istenmiyordu.
 
 **Ne Kazandık?**
-Eski kodu değiştirmeden (zaten değiştiremeyiz), onu bizim sistemimizin anladığı bir formata çevirdik.
+Modüller birbirinden bağımsız hale geldi. Şifreleme aracı sadece olayları "yayınlar", kimin dinlediğiyle ilgilenmez.
 
-### UML Sınıf Diyagramı (Faz 2 Mimari Güncellemesi)
+### Final UML Mimari Diyagramı (Tüm Fazlar)
 
 ```mermaid
 classDiagram
     direction TB
+    
+    %% Behavioral - Observer
+    class IGozlemci {
+        <<interface>>
+        +islemYapildi(mesaj: String)
+    }
+    class KonsolLogger {
+        +islemYapildi(mesaj: String)
+    }
+    IGozlemci <|.. KonsolLogger
+    
+    %% Core Interfaces
     class ISifreleyici {
         <<interface>>
         +sifrele(metin: String)
         +coz(metin: String)
     }
-
-    class SifreleyiciDecorator {
-        <<abstract>>
-        #sarmalananSifreleyici: ISifreleyici
-    }
-    ISifreleyici <|.. SifreleyiciDecorator
-    SifreleyiciDecorator o-- ISifreleyici
-
-    class ZamanDamgaliSifreleyici {
+    
+    %% Strategy Context
+    class SifrelemeAraci {
+        -strateji: ISifreleyici
+        -gozlemciler: List~IGozlemci~
+        +setStrateji(yeniStrateji: ISifreleyici)
+        +gozlemciEkle(g: IGozlemci)
         +sifrele(metin: String)
     }
+    
+    SifrelemeAraci o-- ISifreleyici : "Strateji (Strategy)"
+    SifrelemeAraci o-- IGozlemci : "Gözlemciler (Observer)"
+    
+    %% Creational - Factory
+    class SifrelemeFabrikasi {
+        +sifreleyiciUret(tip: String): ISifreleyici
+    }
+    SifrelemeFabrikasi ..> ISifreleyici : "Üretir"
+    
+    %% Concrete Strategies
+    class AesSifreleyici
+    class RsaSifreleyici
+    ISifreleyici <|.. AesSifreleyici
+    ISifreleyici <|.. RsaSifreleyici
+    
+    %% Structural - Decorator
+    class SifreleyiciDecorator {
+        <<abstract>>
+        #sarmalanan: ISifreleyici
+    }
+    class ZamanDamgaliSifreleyici
+    ISifreleyici <|.. SifreleyiciDecorator
+    SifreleyiciDecorator o-- ISifreleyici
     SifreleyiciDecorator <|-- ZamanDamgaliSifreleyici
-
+    
+    %% Structural - Adapter
     class EskiSistem {
         +karmasikSifrelemeYap(data: String)
     }
-
     class EskiSistemAdapter {
         -eskiSistem: EskiSistem
-        +sifrele(metin: String)
     }
     ISifreleyici <|.. EskiSistemAdapter
-    EskiSistemAdapter --> EskiSistem : "Adapte Eder"
+    EskiSistemAdapter --> EskiSistem : "Adapte eder"
 ```
