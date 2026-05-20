@@ -6,40 +6,17 @@
 `SifrelemeFabrikasi` sınıfında uygulandı.
 
 **Neden Uygulandı?**
-Eski yapıda nesne yaratma mantığı (hangi algoritmanın seçileceği) ile iş mantığı (şifreleme süreci) aynı sınıf (`SifrelemeAraci`) içerisindeydi. Yeni bir şifreleme algoritması ekleneceğinde mevcut sınıfın değişmesi gerekiyordu (Single Responsibility ve Open/Closed prensibi ihlalleri).
+Eski yapıda nesne yaratma mantığı ile iş mantığı aynı sınıf (`SifrelemeAraci`) içerisindeydi. Yeni algoritma eklemek zordu.
 
 **Ne Kazandık?**
-Nesne üretme sorumluluğunu fabrikaya devrederek sınıfların birbirine sıkı sıkıya bağlı (tight coupling) olmasını engelledik. Yeni bir şifreleme algoritması geldiğinde sadece fabrikayı güncelleyip yeni bir sınıf eklemek yetecek.
+Nesne üretme sorumluluğunu fabrikaya devrederek sınıfların birbirine sıkı sıkıya bağlı (tight coupling) olmasını engelledik.
 
-### UML Sınıf Diyagramı (Önce ve Sonra)
-
-```mermaid
-classDiagram
-    direction LR
-    class EskiSifrelemeAraci {
-        -String algoritma
-        +SifrelemeAraci(algoritmaTipi: String)
-        +sifrele(metin: String): String
-        +coz(sifreliMetin: String): String
-    }
-    note for EskiSifrelemeAraci "Tek ve kocaman bir sınıf. \nHer şey bunun içinde."
-```
+### UML Sınıf Diyagramı (Faz 1)
 
 ```mermaid
 classDiagram
-    direction TB
     class ISifreleyici {
         <<interface>>
-        +sifrele(metin: String): String
-        +coz(sifreliMetin: String): String
-    }
-    
-    class AesSifreleyici {
-        +sifrele(metin: String): String
-        +coz(sifreliMetin: String): String
-    }
-    
-    class RsaSifreleyici {
         +sifrele(metin: String): String
         +coz(sifreliMetin: String): String
     }
@@ -50,14 +27,63 @@ classDiagram
     class SifrelemeFabrikasi {
         +sifreleyiciUret(tip: String): ISifreleyici
     }
-    
-    class SifrelemeAraci {
-        -ISifreleyici sifreleyici
-        +SifrelemeAraci(tip: String)
-        +sifrele(metin: String): String
+```
+
+---
+
+## Faz 2 - Decorator & Adapter (Structural)
+
+### 1. Decorator Pattern
+**Nerede Uygulandı?**
+`SifreleyiciDecorator` abstract sınıfı ve `ZamanDamgaliSifreleyici` sınıfında uygulandı.
+
+**Neden Uygulandı?**
+Şifreleme sonuçlarına ek özellikler (örneğin işlem zamanı damgası) eklemek istedik. Bunu var olan `AesSifreleyici` gibi sınıfların içine yazsaydık kod tekrarlarına ve sınıfların şişmesine yol açacaktık (OCP ihlali).
+
+**Ne Kazandık?**
+Çekirdek şifreleme sınıflarına dokunmadan, çalışma zamanında nesnelere yeni davranışlar ekleme esnekliği kazandık.
+
+### 2. Adapter Pattern
+**Nerede Uygulandı?**
+`EskiSistemAdapter` sınıfında uygulandı.
+
+**Neden Uygulandı?**
+Üçüncü parti / eski bir kütüphane olan `EskiSistem` sınıfının metod isimleri, bizim projemizin `ISifreleyici` arayüzüne uymuyordu.
+
+**Ne Kazandık?**
+Eski kodu değiştirmeden (zaten değiştiremeyiz), onu bizim sistemimizin anladığı bir formata çevirdik.
+
+### UML Sınıf Diyagramı (Faz 2 Mimari Güncellemesi)
+
+```mermaid
+classDiagram
+    direction TB
+    class ISifreleyici {
+        <<interface>>
+        +sifrele(metin: String)
+        +coz(metin: String)
     }
-    
-    SifrelemeFabrikasi ..> ISifreleyici : "Üretir"
-    SifrelemeAraci --> SifrelemeFabrikasi : "Kullanır"
-    SifrelemeAraci --> ISifreleyici : "Bağlıdır"
+
+    class SifreleyiciDecorator {
+        <<abstract>>
+        #sarmalananSifreleyici: ISifreleyici
+    }
+    ISifreleyici <|.. SifreleyiciDecorator
+    SifreleyiciDecorator o-- ISifreleyici
+
+    class ZamanDamgaliSifreleyici {
+        +sifrele(metin: String)
+    }
+    SifreleyiciDecorator <|-- ZamanDamgaliSifreleyici
+
+    class EskiSistem {
+        +karmasikSifrelemeYap(data: String)
+    }
+
+    class EskiSistemAdapter {
+        -eskiSistem: EskiSistem
+        +sifrele(metin: String)
+    }
+    ISifreleyici <|.. EskiSistemAdapter
+    EskiSistemAdapter --> EskiSistem : "Adapte Eder"
 ```
