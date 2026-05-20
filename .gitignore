@@ -1,0 +1,5 @@
+# Derleme Dosyaları (Compiled Java files)
+*.class
+
+# Geçici Scriptler
+rewrite.ps1

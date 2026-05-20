@@ -39,14 +39,13 @@ classDiagram
 *(Tüm diyagramın ayrıntılı hali için `PATTERNS.md` dosyasına bakabilirsiniz.)*
 
 ## Nasıl Çalıştırılır?
-Projeyi terminalden veya komut satırından derleyip çalıştırabilirsiniz:
+Projeyi terminalden veya komut satırından derleyip tüm tasarım örüntülerinin ahenk içindeki çalışmasını test etmek için `Main.java` sınıfını çalıştırabilirsiniz:
+
 ```bash
-cd src
-javac *.java
-# (Bu örnekte bir Main.java yok ancak yazılırsa şu şekilde çalışır:)
-# java Main
+# Projenin ana dizinindeyken:
+javac -encoding UTF-8 src/*.java
+java -cp src Main
 ```
-Proje bir kütüphane altyapısı olarak kurgulanmıştır.
 
 ---
 **Hocamın Notu:** AI günlüklerim (`docs/ai-log/`) ve tespit ettiğim problemler (`PROBLEMS.md`) repoda duruyor. Ödev boyunca GitHub Actions ve PR denemeleri de yaptım. Her fazı kendi branch'inde tasarladım. Okuduğunuz için teşekkürler!
