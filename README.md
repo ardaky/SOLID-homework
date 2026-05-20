@@ -48,4 +48,4 @@ java -cp src Main
 ```
 
 ---
-**Hocamın Notu:** AI günlüklerim (`docs/ai-log/`) ve tespit ettiğim problemler (`PROBLEMS.md`) repoda duruyor. Ödev boyunca GitHub Actions ve PR denemeleri de yaptım. Her fazı kendi branch'inde tasarladım. Okuduğunuz için teşekkürler!
+
