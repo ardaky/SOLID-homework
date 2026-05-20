@@ -1,8 +1,7 @@
 # Tasarım Örüntüleri Ödevi - Şifreleme Aracı 🔐
 
-**Öğrenci:** (Amatörden aydınlanmışa giden yol)  
 **Seçilen Konu:** E - Şifreleme Aracı  
-**Gerekçe:** Şifreleme algoritmaları çok ilginç geliyordu, bu yüzden başladım. İlk başta her şey "if-else" ile halledilir sanıyordum ama işler büyüdükçe kodun koca bir çöplüğe (Spagetti Koda) dönüştüğünü fark ettim.
+**Gerekçe:** Şifreleme algoritmalarına siber güvenlik alanınından ilerlemek istediğim için vardı ve şifreleme algoritmaları hep ilginç geliyordu. bu yüzden başladım. İlk başta her şey "if-else" ile halledilir sanıyordum ama işler büyüdükçe kodun koca bir çöplüğe (Spagetti Koda) dönüştüğünü fark ettim.
 
 ## Proje Ne Yapıyor?
 Bu proje, metin tabanlı verileri çeşitli şifreleme algoritmaları (AES, RSA, Base64 ve 3. Parti Kütüphaneler) ile şifreleyen ve daha sonra geri çözen dinamik bir uygulamadır. Runtime (çalışma zamanında) algoritma değiştirebilir ve şifreleme işlemlerini loglayabilir.
