@@ -1,47 +1,17 @@
 public class SifrelemeAraci {
-    private String algoritma;
+    private ISifreleyici sifreleyici;
 
     public SifrelemeAraci(String algoritmaTipi) {
-        // Algoritma tipini doğrudan burada if-else ile kontrol ediyorum.
-        if (algoritmaTipi.equals("AES")) {
-            this.algoritma = "AES";
-        } else if (algoritmaTipi.equals("RSA")) {
-            this.algoritma = "RSA";
-        } else if (algoritmaTipi.equals("Base64")) {
-            this.algoritma = "Base64";
-        } else {
-            System.out.println("Bilinmeyen algoritma!");
-            this.algoritma = "Bilinmeyen";
-        }
+        // Artık if-else ile kendim yaratmıyorum. Fabrika sınıfına devrettim.
+        SifrelemeFabrikasi fabrika = new SifrelemeFabrikasi();
+        this.sifreleyici = fabrika.sifreleyiciUret(algoritmaTipi);
     }
 
     public String sifrele(String metin) {
-        if (this.algoritma.equals("AES")) {
-            System.out.println("AES ile şifreleniyor...");
-            return "AES_SIFRELI_" + metin;
-        } else if (this.algoritma.equals("RSA")) {
-            System.out.println("RSA ile şifreleniyor...");
-            return "RSA_SIFRELI_" + metin;
-        } else if (this.algoritma.equals("Base64")) {
-            System.out.println("Base64 ile şifreleniyor...");
-            return "BASE64_SIFRELI_" + metin;
-        } else {
-            return "Şifrelenemedi!";
-        }
+        return this.sifreleyici.sifrele(metin);
     }
 
     public String coz(String sifreliMetin) {
-        if (this.algoritma.equals("AES")) {
-            System.out.println("AES ile çözülüyor...");
-            return sifreliMetin.replace("AES_SIFRELI_", "");
-        } else if (this.algoritma.equals("RSA")) {
-            System.out.println("RSA ile çözülüyor...");
-            return sifreliMetin.replace("RSA_SIFRELI_", "");
-        } else if (this.algoritma.equals("Base64")) {
-            System.out.println("Base64 ile çözülüyor...");
-            return sifreliMetin.replace("BASE64_SIFRELI_", "");
-        } else {
-            return "Çözülemedi!";
-        }
+        return this.sifreleyici.coz(sifreliMetin);
     }
 }
